@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: "Destroy infrastructure?"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - true
+          - false
 
 jobs:
   terraform:
@@ -29,5 +39,11 @@ jobs:
         working-directory: ./main
 
       - name: Apply Terraform
+        if: github.event.inputs.destroy != 'true'
         run: terraform apply -auto-approve
+        working-directory: ./main
+
+      - name: Destroy Terraform
+        if: github.event.inputs.destroy == 'true'
+        run: terraform destroy -auto-approve
         working-directory: ./main
