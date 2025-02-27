@@ -22,11 +22,11 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
-        working-directory: ./ec2
+        # working-directory: ./ec2
 
       - name: Plan Terraform
         run: terraform plan
-        working-directory: ./ec2
+        # working-directory: ./ec2
 
       - name: Apply Terraform
         run: terraform apply -auto-approve
