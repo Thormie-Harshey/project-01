@@ -1,26 +1,17 @@
-name: Terraform
+name: Terraform Destroy
 
 on:
-  push:
+  delete:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      destroy:
-        description: "Destroy infrastructure?"
-        required: true
-        default: "false"
-        type: choice
-        options:
-          - true
-          - false
 
 jobs:
-  terraform:
+  terraform-destroy:
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,18 +23,4 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
-        working-directory: ./main
-
-      - name: Plan Terraform
-        run: terraform plan
-        working-directory: ./main
-
-      - name: Apply Terraform
-        if: github.event.inputs.destroy != 'true'
-        run: terraform apply -auto-approve
-        working-directory: ./main
-
-      - name: Destroy Terraform
-        if: github.event.inputs.destroy == 'true'
-        run: terraform destroy -auto-approve
-        working-directory: ./main
+        
