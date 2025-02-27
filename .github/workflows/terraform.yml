@@ -1,17 +1,20 @@
-name: Terraform Destroy
+name: Terraform
 
 on:
+  push:
+    branches:
+      - main
   delete:
     branches:
       - main
 
 jobs:
-  terraform-destroy:
+  terraform-apply:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,4 +26,35 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
-        
+        working-directory: ./main
+
+      - name: Plan Terraform
+        run: terraform plan
+        working-directory: ./main
+
+      - name: Apply Terraform
+        run: terraform apply -auto-approve
+        working-directory: ./main
+
+  terraform-destroy:
+    if: github.event_name == 'delete'
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.0
+
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: ./main
+
+      - name: Destroy Terraform
+        run: terraform destroy -auto-approve
+        working-directory: ./main
